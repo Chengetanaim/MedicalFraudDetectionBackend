@@ -57,13 +57,13 @@ def on_startup():
 
 @app.post("/predict")
 def predict_medical_insurance_claims(medical_insurance_data: MedicalInsuranceCreate, session: SessionDep):
-#     model_path = os.path.join(os.path.dirname(__file__), "model.pkl")
-#     try:
-#         with open(model_path, "rb") as f:
-#             model = dill.load(f)
-#     except Exception as e:
-#         print("Failed to load model:", e)
-#         raise HTTPException(status_code=400, detail=f"Failed to load model: {e}")
+    model_path = os.path.join(os.path.dirname(__file__), "model.pkl")
+    try:
+        with open(model_path, "rb") as f:
+            model = dill.load(f)
+    except Exception as e:
+        print("Failed to load model:", e)
+        raise HTTPException(status_code=400, detail=f"Failed to load model: {e}")
 
 #     prediction = model(
 #     RenalDiseaseIndicator=medical_insurance_data.RenalDiseaseIndicator,
