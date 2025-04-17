@@ -101,7 +101,7 @@ def predict_medical_insurance_claims(medical_insurance_data: MedicalInsuranceCre
     # session.refresh(medical_insurance)
     # print(prediction)
     
-    return type(model), repr(model)
+    return type(model)
 
 @app.get("/")
 def read_predicted_results(
