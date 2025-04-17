@@ -1,3 +1,4 @@
+from enum import Enum
 import os
 from typing import Annotated
 from fastapi import Depends, FastAPI, HTTPException, Query
@@ -53,9 +54,12 @@ app = FastAPI()
 def on_startup():
     create_db_and_tables()
 
+class YesNo(str, Enum):
+    No = 'No'
+    Yes = 'Yes'
 
 def detect_fraud(
-    RenalDiseaseIndicator: str,
+    RenalDiseaseIndicator: YesNo,
     ChronicDiseaseIndex: int,
     InscClaimAmtReimbursed: float,
     DeductibleAmtPaid: float,
@@ -99,6 +103,8 @@ def detect_fraud(
         return "Fraud"
 
     return "Not Fraud"
+
+
 
 
 
