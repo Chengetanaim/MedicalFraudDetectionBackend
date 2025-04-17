@@ -58,10 +58,8 @@ def on_startup():
 @app.post("/")
 def predict_medical_insurance_claims(medical_insurance_data: MedicalInsuranceCreate, session: SessionDep):
     model_path = os.path.join(os.path.dirname(__file__), "model.pkl")
-    with open(model_path, "rb") as f:
-        model = dill.load(f)
     try:
-        with open("model.pkl", "rb") as f:
+        with open(model_path, "rb") as f:
             model = dill.load(f)
     except Exception as e:
         print("Failed to load model:", e)
