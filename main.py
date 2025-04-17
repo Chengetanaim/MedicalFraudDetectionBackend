@@ -1,3 +1,4 @@
+import os
 from typing import Annotated
 from fastapi import Depends, FastAPI, HTTPException, Query
 from sqlmodel import Field, Session, SQLModel, create_engine, select
@@ -56,7 +57,8 @@ def on_startup():
 
 @app.post("/")
 def predict_medical_insurance_claims(medical_insurance_data: MedicalInsuranceCreate, session: SessionDep):
-    with open("model.pkl", "rb") as f:
+    model_path = os.path.join(os.path.dirname(__file__), "model.pkl")
+    with open(model_path, "rb") as f:
         model = dill.load(f)
     try:
         with open("model.pkl", "rb") as f:
