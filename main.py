@@ -64,6 +64,10 @@ def predict_medical_insurance_claims(medical_insurance_data: MedicalInsuranceCre
     except Exception as e:
         print("Failed to load model:", e)
         raise HTTPException(status_code=400, detail=f"Failed to load model: {e}")
+    
+    print("Loaded model type:", type(model))
+    print("Loaded model repr:", repr(model))
+
     try:
 
 
@@ -97,7 +101,7 @@ def predict_medical_insurance_claims(medical_insurance_data: MedicalInsuranceCre
     session.refresh(medical_insurance)
     print(prediction)
     
-    return "done"
+    return type(model), repr(model)
 
 @app.get("/")
 def read_predicted_results(
