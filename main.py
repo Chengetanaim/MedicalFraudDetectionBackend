@@ -57,41 +57,41 @@ def on_startup():
 
 @app.post("/predict")
 def predict_medical_insurance_claims(medical_insurance_data: MedicalInsuranceCreate, session: SessionDep):
-    model_path = os.path.join(os.path.dirname(__file__), "model.pkl")
-    try:
-        with open(model_path, "rb") as f:
-            model = dill.load(f)
-    except Exception as e:
-        print("Failed to load model:", e)
-        raise HTTPException(status_code=400, detail=f"Failed to load model: {e}")
+#     model_path = os.path.join(os.path.dirname(__file__), "model.pkl")
+#     try:
+#         with open(model_path, "rb") as f:
+#             model = dill.load(f)
+#     except Exception as e:
+#         print("Failed to load model:", e)
+#         raise HTTPException(status_code=400, detail=f"Failed to load model: {e}")
 
-    prediction = model(
-    RenalDiseaseIndicator=medical_insurance_data.RenalDiseaseIndicator,
-    ChronicDiseaseIndex=medical_insurance_data.ChronicDiseaseIndex,
-    InscClaimAmtReimbursed=medical_insurance_data.InscClaimAmtReimbursed,
-    DeductibleAmtPaid=medical_insurance_data.DeductibleAmtPaid,
-    IPAnnualReimbursementAmt=medical_insurance_data.IPAnnualDeductibleAmt,
-    OPAnnualReimbursementAmt=medical_insurance_data.OPAnnualDeductibleAmt,
-    IPAnnualDeductibleAmt=medical_insurance_data.IPAnnualDeductibleAmt,
-    OPAnnualDeductibleAmt=medical_insurance_data.OPAnnualDeductibleAmt,
-    treatment_intensity_score=medical_insurance_data.treatment_intensity_score
-)
-    medical_insurance = MedicalInsurance( RenalDiseaseIndicator=medical_insurance_data.RenalDiseaseIndicator,
-    ChronicDiseaseIndex=medical_insurance_data.ChronicDiseaseIndex,
-    InscClaimAmtReimbursed=medical_insurance_data.InscClaimAmtReimbursed,
-    DeductibleAmtPaid=medical_insurance_data.DeductibleAmtPaid,
-    IPAnnualReimbursementAmt=medical_insurance_data.IPAnnualDeductibleAmt,
-    OPAnnualReimbursementAmt=medical_insurance_data.OPAnnualDeductibleAmt,
-    IPAnnualDeductibleAmt=medical_insurance_data.IPAnnualDeductibleAmt,
-    OPAnnualDeductibleAmt=medical_insurance_data.OPAnnualDeductibleAmt,
-    treatment_intensity_score=medical_insurance_data.treatment_intensity_score,
-    prediction=prediction)
+#     prediction = model(
+#     RenalDiseaseIndicator=medical_insurance_data.RenalDiseaseIndicator,
+#     ChronicDiseaseIndex=medical_insurance_data.ChronicDiseaseIndex,
+#     InscClaimAmtReimbursed=medical_insurance_data.InscClaimAmtReimbursed,
+#     DeductibleAmtPaid=medical_insurance_data.DeductibleAmtPaid,
+#     IPAnnualReimbursementAmt=medical_insurance_data.IPAnnualDeductibleAmt,
+#     OPAnnualReimbursementAmt=medical_insurance_data.OPAnnualDeductibleAmt,
+#     IPAnnualDeductibleAmt=medical_insurance_data.IPAnnualDeductibleAmt,
+#     OPAnnualDeductibleAmt=medical_insurance_data.OPAnnualDeductibleAmt,
+#     treatment_intensity_score=medical_insurance_data.treatment_intensity_score
+# )
+#     medical_insurance = MedicalInsurance( RenalDiseaseIndicator=medical_insurance_data.RenalDiseaseIndicator,
+#     ChronicDiseaseIndex=medical_insurance_data.ChronicDiseaseIndex,
+#     InscClaimAmtReimbursed=medical_insurance_data.InscClaimAmtReimbursed,
+#     DeductibleAmtPaid=medical_insurance_data.DeductibleAmtPaid,
+#     IPAnnualReimbursementAmt=medical_insurance_data.IPAnnualDeductibleAmt,
+#     OPAnnualReimbursementAmt=medical_insurance_data.OPAnnualDeductibleAmt,
+#     IPAnnualDeductibleAmt=medical_insurance_data.IPAnnualDeductibleAmt,
+#     OPAnnualDeductibleAmt=medical_insurance_data.OPAnnualDeductibleAmt,
+#     treatment_intensity_score=medical_insurance_data.treatment_intensity_score,
+#     prediction=prediction)
     
-    session.add(medical_insurance)
-    session.commit()
-    session.refresh(medical_insurance)
+#     session.add(medical_insurance)
+#     session.commit()
+#     session.refresh(medical_insurance)
     
-    return medical_insurance
+    return "medical_insurance"
 
 
 @app.get("/")
