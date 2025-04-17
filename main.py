@@ -1,5 +1,5 @@
 from typing import Annotated
-from fastapi import Depends, FastAPI, Query
+from fastapi import Depends, FastAPI, HTTPException, Query
 from sqlmodel import Field, Session, SQLModel, create_engine, select
 import dill
 
@@ -58,6 +58,12 @@ def on_startup():
 def predict_medical_insurance_claims(medical_insurance_data: MedicalInsuranceCreate, session: SessionDep):
     with open("model.pkl", "rb") as f:
         model = dill.load(f)
+    try:
+        with open("model.pkl", "rb") as f:
+            model = dill.load(f)
+    except Exception as e:
+        print("Failed to load model:", e)
+        raise HTTPException(status_code=400, detail=f"Failed to load model: {e}")
 
     prediction = model(
     RenalDiseaseIndicator=medical_insurance_data.RenalDiseaseIndicator,
