@@ -5,8 +5,11 @@ from fastapi import Depends, FastAPI, HTTPException, Query
 from sqlmodel import Field, Session, SQLModel, create_engine, select
 import dill
 
+class YesNo(str, Enum):
+    No = 'No'
+    Yes = 'Yes'
 class MedicalInsuranceBase(SQLModel):
-    RenalDiseaseIndicator:str
+    RenalDiseaseIndicator:YesNo
     ChronicDiseaseIndex:int
     InscClaimAmtReimbursed:int
     DeductibleAmtPaid:int
@@ -54,12 +57,10 @@ app = FastAPI()
 def on_startup():
     create_db_and_tables()
 
-class YesNo(str, Enum):
-    No = 'No'
-    Yes = 'Yes'
+
 
 def detect_fraud(
-    RenalDiseaseIndicator: YesNo,
+    RenalDiseaseIndicator: str,
     ChronicDiseaseIndex: int,
     InscClaimAmtReimbursed: float,
     DeductibleAmtPaid: float,
