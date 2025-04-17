@@ -54,54 +54,85 @@ def on_startup():
     create_db_and_tables()
 
 
+def detect_fraud(
+    RenalDiseaseIndicator: str,
+    ChronicDiseaseIndex: int,
+    InscClaimAmtReimbursed: float,
+    DeductibleAmtPaid: float,
+    IPAnnualReimbursementAmt: float,
+    OPAnnualReimbursementAmt: float,
+    IPAnnualDeductibleAmt: float,
+    OPAnnualDeductibleAmt: float,
+    treatment_intensity_score: float = 0.0  # optional: 0=low, 1=high
+) -> str:
+    """
+    Returns 'Fraud' or 'Not Fraud' based on input values and defined heuristics.
+
+    :param RenalDiseaseIndicator: 'Y' or 'N'
+    :param ChronicDiseaseIndex: Integer (0 = no chronic diseases)
+    :param InscClaimAmtReimbursed: Reimbursement amount for this claim
+    :param DeductibleAmtPaid: Deductible amount paid by patient
+    :param IPAnnualReimbursementAmt: Annual inpatient reimbursement
+    :param OPAnnualReimbursementAmt: Annual outpatient reimbursement
+    :param IPAnnualDeductibleAmt: Annual inpatient deductible
+    :param OPAnnualDeductibleAmt: Annual outpatient deductible
+    :param treatment_intensity_score: Optional score (0.0–1.0) representing treatment intensity
+    """
+    # Rule 1: High treatment but no chronic disease
+    if ChronicDiseaseIndex == 0 and treatment_intensity_score > 0.7:
+        return "Fraud"
+
+    # Rule 2: Unusually high reimbursement
+    if InscClaimAmtReimbursed > 50000:
+        return "Fraud"
+
+    # Rule 3: Minimal deductible paid but high reimbursement
+    if DeductibleAmtPaid < 100 and InscClaimAmtReimbursed > 10000:
+        return "Fraud"
+
+    # Rule 4: Suspicious spikes in annual reimbursements
+    if IPAnnualReimbursementAmt > 100000 or OPAnnualReimbursementAmt > 80000:
+        return "Fraud"
+
+    # Rule 5: Deductible manipulation patterns
+    if IPAnnualDeductibleAmt < 200 and OPAnnualDeductibleAmt < 200 and (IPAnnualReimbursementAmt + OPAnnualReimbursementAmt) > 50000:
+        return "Fraud"
+
+    return "Not Fraud"
+
+
+
 
 @app.post("/predict")
 def predict_medical_insurance_claims(medical_insurance_data: MedicalInsuranceCreate, session: SessionDep):
-    model_path = os.path.join(os.path.dirname(__file__), "model.pkl")
-    try:
-        with open(model_path, "rb") as f:
-            model = dill.load(f)
-    except Exception as e:
-        print("Failed to load model:", e)
-        raise HTTPException(status_code=400, detail=f"Failed to load model: {e}")
+    prediction = detect_fraud(
+        RenalDiseaseIndicator=medical_insurance_data.RenalDiseaseIndicator,
+        ChronicDiseaseIndex=medical_insurance_data.ChronicDiseaseIndex,
+        InscClaimAmtReimbursed=medical_insurance_data.InscClaimAmtReimbursed,
+        DeductibleAmtPaid=medical_insurance_data.DeductibleAmtPaid,
+        IPAnnualReimbursementAmt=medical_insurance_data.IPAnnualDeductibleAmt,
+        OPAnnualReimbursementAmt=medical_insurance_data.OPAnnualDeductibleAmt,
+        IPAnnualDeductibleAmt=medical_insurance_data.IPAnnualDeductibleAmt,
+        OPAnnualDeductibleAmt=medical_insurance_data.OPAnnualDeductibleAmt,
+        treatment_intensity_score=medical_insurance_data.treatment_intensity_score
+    )
+ 
+    medical_insurance = MedicalInsurance( RenalDiseaseIndicator=medical_insurance_data.RenalDiseaseIndicator,
+    ChronicDiseaseIndex=medical_insurance_data.ChronicDiseaseIndex,
+    InscClaimAmtReimbursed=medical_insurance_data.InscClaimAmtReimbursed,
+    DeductibleAmtPaid=medical_insurance_data.DeductibleAmtPaid,
+    IPAnnualReimbursementAmt=medical_insurance_data.IPAnnualDeductibleAmt,
+    OPAnnualReimbursementAmt=medical_insurance_data.OPAnnualDeductibleAmt,
+    IPAnnualDeductibleAmt=medical_insurance_data.IPAnnualDeductibleAmt,
+    OPAnnualDeductibleAmt=medical_insurance_data.OPAnnualDeductibleAmt,
+    treatment_intensity_score=medical_insurance_data.treatment_intensity_score,
+    prediction=prediction)
     
-    print("Loaded model type:", type(model))
-    print("Loaded model repr:", repr(model))
-
-    # try:
-
-
-    #     prediction = model(
-    #     RenalDiseaseIndicator=medical_insurance_data.RenalDiseaseIndicator,
-    #     ChronicDiseaseIndex=medical_insurance_data.ChronicDiseaseIndex,
-    #     InscClaimAmtReimbursed=medical_insurance_data.InscClaimAmtReimbursed,
-    #     DeductibleAmtPaid=medical_insurance_data.DeductibleAmtPaid,
-    #     IPAnnualReimbursementAmt=medical_insurance_data.IPAnnualDeductibleAmt,
-    #     OPAnnualReimbursementAmt=medical_insurance_data.OPAnnualDeductibleAmt,
-    #     IPAnnualDeductibleAmt=medical_insurance_data.IPAnnualDeductibleAmt,
-    #     OPAnnualDeductibleAmt=medical_insurance_data.OPAnnualDeductibleAmt,
-    #     treatment_intensity_score=medical_insurance_data.treatment_intensity_score
-    # )
-    # except Exception as e:
-    #     print("Failed to predict:", e)
-    #     raise HTTPException(status_code=400, detail=f"Failed to predict: {e}")
-    # medical_insurance = MedicalInsurance( RenalDiseaseIndicator=medical_insurance_data.RenalDiseaseIndicator,
-    # ChronicDiseaseIndex=medical_insurance_data.ChronicDiseaseIndex,
-    # InscClaimAmtReimbursed=medical_insurance_data.InscClaimAmtReimbursed,
-    # DeductibleAmtPaid=medical_insurance_data.DeductibleAmtPaid,
-    # IPAnnualReimbursementAmt=medical_insurance_data.IPAnnualDeductibleAmt,
-    # OPAnnualReimbursementAmt=medical_insurance_data.OPAnnualDeductibleAmt,
-    # IPAnnualDeductibleAmt=medical_insurance_data.IPAnnualDeductibleAmt,
-    # OPAnnualDeductibleAmt=medical_insurance_data.OPAnnualDeductibleAmt,
-    # treatment_intensity_score=medical_insurance_data.treatment_intensity_score,
-    # prediction=prediction)
+    session.add(medical_insurance)
+    session.commit()
+    session.refresh(medical_insurance)
     
-    # session.add(medical_insurance)
-    # session.commit()
-    # session.refresh(medical_insurance)
-    # print(prediction)
-    
-    return type(model)
+    return medical_insurance
 
 @app.get("/")
 def read_predicted_results(
