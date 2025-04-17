@@ -55,7 +55,7 @@ def on_startup():
 
 
 
-@app.post("/")
+@app.post("/predict")
 def predict_medical_insurance_claims(medical_insurance_data: MedicalInsuranceCreate, session: SessionDep):
     model_path = os.path.join(os.path.dirname(__file__), "model.pkl")
     try:
